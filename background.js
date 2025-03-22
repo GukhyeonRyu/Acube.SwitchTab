@@ -1,6 +1,5 @@
 const tabHistory = []
-currentTab = null
-tabIndex = 0
+tabIndex = 1
 
 function removeHistory(tabId) {
   removedIdx = tabHistory.findIndex(history => history.id == tabId)
@@ -11,11 +10,7 @@ function removeHistory(tabId) {
 
 function pushHistory(tabId, windowId) {
   removeHistory(tabId)
-
-  if (currentTab != null)
-    tabHistory.push(currentTab)
-
-  currentTab = { id: tabId, windowId: windowId }
+  tabHistory.push({ id: tabId, windowId: windowId })
 
   if (tabHistory.length > 50)
     tabHistory.shift();
@@ -40,6 +35,7 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
   console.log(`Active ${activeInfo.tabId}, ${activeInfo.windowId}`)
 
   pushHistory(activeInfo.tabId, activeInfo.windowId)
+  console.log(tabHistory)
 });
 
 chrome.tabs.onRemoved.addListener(tabId => {
@@ -48,7 +44,9 @@ chrome.tabs.onRemoved.addListener(tabId => {
 
 chrome.commands.onCommand.addListener(command => {
   if (command === "switch_tab") {
-    lastTab = popHistory(tabIndex)
+    if (tabHistory.length >= tabIndex)
+
+    lastTab = tabHistory[tabHistory.length - 1 - tabIndex]
     console.log(`Switch to tab ${lastTab.id}(${lastTab.windowId})`)
 
     if (lastTab != undefined) {
