@@ -1,5 +1,8 @@
+const MULTI_TAB_THRESHOLD = 300
+
 const tabHistory = []
 tabIndex = 1
+timerId = 0
 
 function removeHistory(tabId) {
   removedIdx = tabHistory.findIndex(history => history.id == tabId)
@@ -20,6 +23,11 @@ function popHistory(index) {
   return tabHistory.splice(tabHistory.length - 1 - index)[0]
 }
 
+function reset() {
+  tabIndex = 1
+  timerId = 0
+}
+
 chrome.windows.onFocusChanged.addListener((windowId) => {
   if (windowId !== chrome.windows.WINDOW_ID_NONE) {
     chrome.tabs.query({ active: true, windowId: windowId }).then(tabs => {
@@ -35,7 +43,6 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
   console.log(`Active ${activeInfo.tabId}, ${activeInfo.windowId}`)
 
   pushHistory(activeInfo.tabId, activeInfo.windowId)
-  console.log(tabHistory)
 });
 
 chrome.tabs.onRemoved.addListener(tabId => {
@@ -44,7 +51,8 @@ chrome.tabs.onRemoved.addListener(tabId => {
 
 chrome.commands.onCommand.addListener(command => {
   if (command === "switch_tab") {
-    if (tabHistory.length >= tabIndex)
+    if (tabHistory.length < 2)
+      return
 
     lastTab = tabHistory[tabHistory.length - 1 - tabIndex]
     console.log(`Switch to tab ${lastTab.id}(${lastTab.windowId})`)
@@ -53,5 +61,14 @@ chrome.commands.onCommand.addListener(command => {
       chrome.windows.update(lastTab.windowId, { focused: true})
       chrome.tabs.update(lastTab.id, { active: true })
     }
+
+    if (timerId != 0)
+      clearTimeout(timerId)
+
+    timerId = setTimeout(reset, MULTI_TAB_THRESHOLD)
+    tabIndex++
+
+    if (tabIndex == tabHistory.length)
+      tabIndex = 1
   }
 });
