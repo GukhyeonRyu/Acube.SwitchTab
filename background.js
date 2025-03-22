@@ -1,5 +1,6 @@
-const tabHistory = [{}];
-currentTab = null;
+const tabHistory = []
+currentTab = null
+tabIndex = 0
 
 function removeHistory(tabId) {
   removedIdx = tabHistory.findIndex(history => history.id == tabId)
@@ -20,11 +21,15 @@ function pushHistory(tabId, windowId) {
     tabHistory.shift();
 }
 
+function popHistory(index) {
+  return tabHistory.splice(tabHistory.length - 1 - index)[0]
+}
+
 chrome.windows.onFocusChanged.addListener((windowId) => {
   if (windowId !== chrome.windows.WINDOW_ID_NONE) {
     chrome.tabs.query({ active: true, windowId: windowId }).then(tabs => {
       if (tabs.length > 0) {
-        console.log(`Active ${tabs[0].id}, ${windowId}`)
+        console.log(`Activated ${tabs[0].id}(${windowId})`)
         pushHistory(tabs[0].id, windowId)
       }
     });
@@ -43,8 +48,8 @@ chrome.tabs.onRemoved.addListener(tabId => {
 
 chrome.commands.onCommand.addListener(command => {
   if (command === "switch_tab") {
-    lastTab = tabHistory.pop()
-    console.log(`Last tab is ${lastTab.id} ${lastTab.windowId}`)
+    lastTab = popHistory(tabIndex)
+    console.log(`Switch to tab ${lastTab.id}(${lastTab.windowId})`)
 
     if (lastTab != undefined) {
       chrome.windows.update(lastTab.windowId, { focused: true})
