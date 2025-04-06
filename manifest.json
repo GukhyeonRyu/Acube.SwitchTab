@@ -15,7 +15,7 @@
             "suggested_key": {
                 "default": "Alt+W"
             },
-        "description": "Switch to the most recently used tab."
+        "description": "Switch Tab"
         }
     }
 }
