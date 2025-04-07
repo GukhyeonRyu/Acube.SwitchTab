@@ -47,6 +47,8 @@ chrome.tabs.onActivated.addListener(async activeInfo => {
 });
 
 chrome.tabs.onRemoved.addListener(tabId => {
+  console.log(`Removed ${tabId}`)
+  
   removeHistory(tabId)
 });
 
