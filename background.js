@@ -20,10 +20,6 @@ function pushHistory(tabId, windowId) {
     tabHistory.shift();
 }
 
-function popHistory(index) {
-  return tabHistory.splice(tabHistory.length - 1 - index)[0]
-}
-
 function timeouted(tab) {
   tabIndex = 1
   timerId = 0
