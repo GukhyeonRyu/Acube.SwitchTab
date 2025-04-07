@@ -90,6 +90,6 @@ chrome.commands.onCommand.addListener(command => {
     tabSwitching = true
 
     if (tabIndex == tabHistory.length)
-      tabIndex = 1
+      tabIndex = 0
   }
 });
