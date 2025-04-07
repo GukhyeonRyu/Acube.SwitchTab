@@ -1,23 +1,40 @@
 const MULTI_TAB_THRESHOLD = 300
 
-const tabHistory = []
+let tabHistory = []
+
+chrome.storage.local.get("tabHistory").then(async (result) => {
+  tabHistory = result.tabHistory;
+
+  if (tabHistory == undefined) {
+    tabHistory = []
+    await chrome.storage.local.set({ tabHistory });
+  }
+
+  console.log("tabHistory reloaded"); // 이곳에서 'tabHistory' 값을 사용할 수 있어
+  console.log(tabHistory)
+});
+
 tabIndex = 1
 timerId = 0
 tabSwitching = false
 
-function removeHistory(tabId) {
+async function removeHistory(tabId) {
   removedIdx = tabHistory.findIndex(history => history.id == tabId)
 
   if (removedIdx != -1)
     tabHistory.splice(removedIdx, 1)
+
+  await chrome.storage.local.set({ tabHistory });
 }
 
-function pushHistory(tabId, windowId) {
+async function pushHistory(tabId, windowId) {
   removeHistory(tabId)
   tabHistory.push({ id: tabId, windowId: windowId })
 
   if (tabHistory.length > 50)
     tabHistory.shift();
+
+  await chrome.storage.local.set({ tabHistory });
 }
 
 function timeouted(tab) {

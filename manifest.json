@@ -8,7 +8,8 @@
     },
     "permissions": [
         "tabs",
-        "commands"
+        "commands",
+        "storage"
     ],
     "commands": {
         "switch_tab": {
